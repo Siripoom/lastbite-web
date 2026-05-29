@@ -1,0 +1,108 @@
+[
+  {
+    "id": "ORD-001",
+    "userId": "cust_001",
+    "storeId": "store_001",
+    "storeName": "Bakery Bloom",
+    "storeImageUrl": "https://picsum.photos/seed/store1/200/200",
+    "items": [
+      { "productId": "prod_001", "name": "ครัวซองต์เนยสด", "price": 45, "quantity": 2, "imageUrl": "https://picsum.photos/seed/prod1/400/300" },
+      { "productId": "prod_002", "name": "เค้กช็อกโกแลต", "price": 60, "quantity": 1, "imageUrl": "https://picsum.photos/seed/prod2/400/300" }
+    ],
+    "status": "waitingPickup",
+    "pickupCode": "4821",
+    "pickupTime": "18:00 - 19:30",
+    "paymentMethod": "promptPay",
+    "totalOriginalPrice": 290,
+    "totalPrice": 150,
+    "createdAt": "2026-04-03T09:00:00+07:00"
+  },
+  {
+    "id": "ORD-002",
+    "userId": "cust_001",
+    "storeId": "store_003",
+    "storeName": "ข้าวกล่องอิ่มดี",
+    "storeImageUrl": "https://picsum.photos/seed/store3/200/200",
+    "items": [
+      { "productId": "prod_007", "name": "ข้าวผัดกระเพราหมูสับ", "price": 35, "quantity": 1, "imageUrl": "https://picsum.photos/seed/prod7/400/300" },
+      { "productId": "prod_008", "name": "ข้าวมันไก่", "price": 30, "quantity": 1, "imageUrl": "https://picsum.photos/seed/prod8/400/300" }
+    ],
+    "status": "preparing",
+    "pickupCode": "7293",
+    "pickupTime": "13:00 - 14:30",
+    "paymentMethod": "mobileBanking",
+    "totalOriginalPrice": 115,
+    "totalPrice": 65,
+    "createdAt": "2026-04-03T07:00:00+07:00"
+  },
+  {
+    "id": "ORD-003",
+    "userId": "cust_001",
+    "storeId": "store_005",
+    "storeName": "Sweet Day Cafe",
+    "storeImageUrl": "https://picsum.photos/seed/store5/200/200",
+    "items": [
+      { "productId": "prod_012", "name": "ชีสเค้กบลูเบอร์รี่", "price": 75, "quantity": 1, "imageUrl": "https://picsum.photos/seed/prod12/400/300" }
+    ],
+    "status": "completed",
+    "pickupCode": "1567",
+    "pickupTime": "20:00 - 21:30",
+    "paymentMethod": "promptPay",
+    "totalOriginalPrice": 150,
+    "totalPrice": 75,
+    "createdAt": "2026-04-02T14:00:00+07:00"
+  },
+  {
+    "id": "ORD-004",
+    "userId": "cust_001",
+    "storeId": "store_002",
+    "storeName": "ชานมมุมตึก",
+    "storeImageUrl": "https://picsum.photos/seed/store2/200/200",
+    "items": [
+      { "productId": "prod_004", "name": "ชานมไข่มุก", "price": 35, "quantity": 2, "imageUrl": "https://picsum.photos/seed/prod4/400/300" }
+    ],
+    "status": "completed",
+    "pickupCode": "3845",
+    "pickupTime": "19:00 - 20:30",
+    "paymentMethod": "promptPay",
+    "totalOriginalPrice": 130,
+    "totalPrice": 70,
+    "createdAt": "2026-04-01T12:00:00+07:00"
+  },
+  {
+    "id": "ORD-005",
+    "userId": "cust_001",
+    "storeId": "store_006",
+    "storeName": "ครัวอร่อยลดโลก",
+    "storeImageUrl": "https://picsum.photos/seed/store6/200/200",
+    "items": [
+      { "productId": "prod_014", "name": "ผัดไทยกุ้งสด", "price": 39, "quantity": 1, "imageUrl": "https://picsum.photos/seed/prod14/400/300" },
+      { "productId": "prod_015", "name": "ส้มตำไทย", "price": 25, "quantity": 1, "imageUrl": "https://picsum.photos/seed/prod15/400/300" }
+    ],
+    "status": "missed",
+    "pickupCode": "9102",
+    "pickupTime": "17:00 - 18:30",
+    "paymentMethod": "mobileBanking",
+    "totalOriginalPrice": 120,
+    "totalPrice": 64,
+    "createdAt": "2026-03-31T10:00:00+07:00"
+  },
+  {
+    "id": "ORD-006",
+    "userId": "cust_001",
+    "storeId": "store_004",
+    "storeName": "Fresh Fruit Cup",
+    "storeImageUrl": "https://picsum.photos/seed/store4/200/200",
+    "items": [
+      { "productId": "prod_010", "name": "ผลไม้รวมถ้วย", "price": 45, "quantity": 2, "imageUrl": "https://picsum.photos/seed/prod10/400/300" },
+      { "productId": "prod_011", "name": "น้ำมะม่วงปั่น", "price": 35, "quantity": 1, "imageUrl": "https://picsum.photos/seed/prod11/400/300" }
+    ],
+    "status": "ready",
+    "pickupCode": "5634",
+    "pickupTime": "17:00 - 18:30",
+    "paymentMethod": "promptPay",
+    "totalOriginalPrice": 230,
+    "totalPrice": 125,
+    "createdAt": "2026-04-03T05:00:00+07:00"
+  }
+]

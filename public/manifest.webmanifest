@@ -1,0 +1,19 @@
+{
+  "name": "LastBite",
+  "short_name": "LastBite",
+  "description": "ค้นหาอาหารลดราคาจากร้านใกล้คุณ และช่วยลดขยะอาหาร",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFD600",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/lastbite-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

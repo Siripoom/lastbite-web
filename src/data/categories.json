@@ -1,0 +1,7 @@
+[
+  { "id": "bakery",       "name": "เบเกอรี่",        "icon": "🍞" },
+  { "id": "drinks",       "name": "เครื่องดื่ม",     "icon": "🧋" },
+  { "id": "ready_to_eat", "name": "อาหารพร้อมทาน",  "icon": "🍱" },
+  { "id": "snacks",       "name": "ของทานเล่น",      "icon": "🍿" },
+  { "id": "fruits",       "name": "ผลไม้",           "icon": "🍉" }
+]
