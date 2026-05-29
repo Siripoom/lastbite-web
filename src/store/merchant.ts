@@ -24,9 +24,16 @@ interface MerchantState {
   orders: Order[];
   withdrawalRequests: WithdrawalRequest[];
   updateStore: (input: Partial<Store>) => void;
+  createProduct: (input: Omit<Product, "id" | "storeId" | "discountPercent">) => void;
   updateProduct: (productId: string, input: Partial<Product>) => void;
+  deleteProduct: (productId: string) => void;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   createWithdrawalRequest: (input: Omit<WithdrawalRequest, "id" | "storeId" | "status" | "createdAt">) => void;
+}
+
+function calculateDiscountPercent(originalPrice: number, discountedPrice: number) {
+  if (originalPrice <= 0) return 0;
+  return Math.max(0, Math.round(((originalPrice - discountedPrice) / originalPrice) * 100));
 }
 
 export const useMerchantStore = create<MerchantState>((set) => ({
@@ -40,11 +47,40 @@ export const useMerchantStore = create<MerchantState>((set) => ({
     set((state) => ({ store: { ...state.store, ...input } }));
   },
 
+  createProduct: (input) => {
+    set((state) => ({
+      products: [
+        {
+          ...input,
+          id: `prod_${Date.now()}`,
+          storeId: state.store.id,
+          discountPercent: calculateDiscountPercent(input.originalPrice, input.discountedPrice),
+        },
+        ...state.products,
+      ],
+    }));
+  },
+
   updateProduct: (productId, input) => {
     set((state) => ({
       products: state.products.map((product) =>
-        product.id === productId ? { ...product, ...input } : product,
+        product.id === productId
+          ? {
+              ...product,
+              ...input,
+              discountPercent: calculateDiscountPercent(
+                input.originalPrice ?? product.originalPrice,
+                input.discountedPrice ?? product.discountedPrice,
+              ),
+            }
+          : product,
       ),
+    }));
+  },
+
+  deleteProduct: (productId) => {
+    set((state) => ({
+      products: state.products.filter((product) => product.id !== productId),
     }));
   },
 

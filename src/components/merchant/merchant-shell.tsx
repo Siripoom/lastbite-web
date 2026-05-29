@@ -64,19 +64,17 @@ export function MerchantShell({ children }: { children: React.ReactNode }) {
         <main>{children}</main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-black/12 bg-white/98 px-2 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-18px_36px_rgba(28,27,27,0.14)] backdrop-blur-xl md:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
+      <nav className="fixed inset-x-0 bottom-0 z-40 px-3 pb-3 md:hidden safe-bottom">
+        <div className="mx-auto grid max-w-md grid-cols-5 gap-1 rounded-[1.6rem] border border-black/8 bg-white/92 p-2 shadow-[0_20px_40px_rgba(28,27,27,0.12)] backdrop-blur">
           {navItems.map((item) => {
-            const active = pathname === item.href;
+            const active = pathname === item.href || (item.href !== "/merchant" && pathname.startsWith(item.href));
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl border px-1 text-[11px] font-black transition",
-                  active
-                    ? "border-[#FFD600] bg-[#1C1B1B] text-[#FFD95A] shadow-[0_12px_24px_rgba(28,27,27,0.2)] ring-2 ring-[#FFD600]/35"
-                    : "border-transparent bg-transparent text-[#8A8A8A] hover:bg-black/[0.035] hover:text-[#5D5F5F]",
+                  "flex min-h-12 flex-col items-center justify-center gap-1 rounded-[1rem] px-1 text-[11px] font-semibold text-[#6B675B] transition",
+                  active && "bg-[#FFF4C8] text-[#1C1B1B] shadow-[inset_0_0_0_1px_rgba(160,112,0,0.08)]",
                 )}
               >
                 <item.icon className="h-5 w-5" />
