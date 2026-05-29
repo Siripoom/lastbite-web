@@ -26,7 +26,7 @@ interface CustomerState {
   updateQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
   clearCart: () => void;
-  placeOrder: (paymentMethod: PaymentMethod) => Order | null;
+  placeOrder: (input: { paymentMethod: PaymentMethod; paymentProofUrl: string; paymentProofFileName: string }) => Order | null;
   suspendDemoUser: (isActive: boolean) => void;
 }
 
@@ -92,7 +92,7 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
 
   clearCart: () => set({ cart: [] }),
 
-  placeOrder: (paymentMethod) => {
+  placeOrder: ({ paymentMethod, paymentProofUrl, paymentProofFileName }) => {
     const cart = get().cart;
     if (!cart.length) return null;
 
@@ -117,6 +117,8 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
       pickupCode: makePickupCode(),
       pickupTime: firstItem.pickupTime,
       paymentMethod,
+      paymentProofUrl,
+      paymentProofFileName,
       totalOriginalPrice,
       totalPrice,
       createdAt: new Date().toISOString(),

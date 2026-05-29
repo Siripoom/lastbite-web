@@ -81,6 +81,8 @@ export interface Order {
   pickupCode: string;
   pickupTime: string;
   paymentMethod: PaymentMethod;
+  paymentProofUrl?: string;
+  paymentProofFileName?: string;
   totalOriginalPrice: number;
   totalPrice: number;
   createdAt: string;

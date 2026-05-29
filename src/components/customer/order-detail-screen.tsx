@@ -60,6 +60,16 @@ export function OrderDetailScreen({ orderId }: { orderId: string }) {
           <div className="flex justify-between"><span>วิธีชำระ</span><span>{paymentMethodLabel(order.paymentMethod)}</span></div>
         </div>
       </Card>
+
+      {order.paymentProofUrl ? (
+        <Card className="p-5">
+          <h2 className="text-lg font-bold">หลักฐานการโอนเงิน</h2>
+          <p className="mt-1 text-sm text-[#5D5F5F]">{order.paymentProofFileName}</p>
+          <div className="mt-4 overflow-hidden rounded-2xl border border-black/8">
+            <img src={order.paymentProofUrl} alt="หลักฐานการโอนเงิน" className="max-h-96 w-full object-cover" />
+          </div>
+        </Card>
+      ) : null}
     </div>
   );
 }
