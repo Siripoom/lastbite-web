@@ -38,3 +38,12 @@ export function paymentMethodLabel(method: PaymentMethod) {
 export function makePickupCode() {
   return Math.floor(1000 + Math.random() * 9000).toString();
 }
+
+export function merchantOrderCheckPath(orderId: string, pickupCode: string) {
+  const params = new URLSearchParams({ orderId, code: pickupCode });
+  return `/merchant/orders/check?${params.toString()}`;
+}
+
+export function merchantOrderCheckUrl(origin: string, orderId: string, pickupCode: string) {
+  return `${origin}${merchantOrderCheckPath(orderId, pickupCode)}`;
+}
