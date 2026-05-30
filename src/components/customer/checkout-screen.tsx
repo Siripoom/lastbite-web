@@ -157,6 +157,11 @@ export function CheckoutScreen() {
           <div className="flex justify-between"><span>ส่วนลด</span><span>-{formatCurrency(totalOriginal - total)}</span></div>
           <Separator />
           <div className="flex justify-between text-lg font-extrabold"><span>ยอดชำระ</span><span>{formatCurrency(total)}</span></div>
+          {totalOriginal > total && (
+            <div className="rounded-xl bg-green-50 px-3 py-2 text-center text-xs font-bold text-green-700">
+              คุณประหยัดได้ {formatCurrency(totalOriginal - total)}!
+            </div>
+          )}
           <div className="flex justify-between"><span>วิธีชำระ</span><span>{paymentMethodLabel(method)}</span></div>
           <div className="flex justify-between"><span>หลักฐาน</span><span>{proofFileName || "ยังไม่ได้อัปโหลด"}</span></div>
         </div>

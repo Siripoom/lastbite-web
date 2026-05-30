@@ -101,6 +101,7 @@ export function OrderDetailScreen({ orderId }: { orderId: string }) {
         <Separator className="my-5" />
         <div className="space-y-2 text-sm">
           <div className="flex justify-between"><span>ราคาก่อนลด</span><span>{formatCurrency(order.totalOriginalPrice)}</span></div>
+          <div className="flex justify-between text-green-700"><span>ประหยัดได้</span><span>-{formatCurrency(order.totalOriginalPrice - order.totalPrice)}</span></div>
           <div className="flex justify-between"><span>ยอดชำระ</span><span>{formatCurrency(order.totalPrice)}</span></div>
           <div className="flex justify-between"><span>วิธีชำระ</span><span>{paymentMethodLabel(order.paymentMethod)}</span></div>
         </div>

@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SettingsIcon } from "@/components/ui/icons";
 import { Separator } from "@/components/ui/separator";
+import { formatCurrency } from "@/lib/utils";
 import { useCustomerStore } from "@/store/customer";
 
 export function ProfileScreen() {
   const { user, orders } = useCustomerStore();
   const completed = orders.filter((order) => order.status === "completed").length;
+  const totalSavings = orders.reduce((sum, order) => sum + (order.totalOriginalPrice - order.totalPrice), 0);
 
   return (
     <div className="space-y-5">
@@ -31,7 +33,7 @@ export function ProfileScreen() {
         <div className="grid grid-cols-3 gap-3 text-center">
           <div><p className="text-2xl font-black">{orders.length}</p><p className="text-xs text-[#5D5F5F]">ออเดอร์</p></div>
           <div><p className="text-2xl font-black">{completed}</p><p className="text-xs text-[#5D5F5F]">รับแล้ว</p></div>
-          <div><p className="text-2xl font-black">฿</p><p className="text-xs text-[#5D5F5F]">ประหยัด</p></div>
+          <div><p className="text-2xl font-black">{formatCurrency(totalSavings)}</p><p className="text-xs text-[#5D5F5F]">ประหยัด</p></div>
         </div>
       </Card>
       <Card className="p-5">

@@ -38,6 +38,7 @@ type ProductFormState = {
   isLuckyBag: boolean;
   pickupStart: string;
   pickupEnd: string;
+  bestBefore: string;
 };
 
 const imageInputClass =
@@ -60,6 +61,7 @@ function createBlankForm(): ProductFormState {
     isLuckyBag: false,
     pickupStart: "18:00",
     pickupEnd: "19:30",
+    bestBefore: "",
   };
 }
 
@@ -76,6 +78,7 @@ function createFormFromProduct(product: Product): ProductFormState {
     isLuckyBag: product.isLuckyBag,
     pickupStart: product.pickupStart,
     pickupEnd: product.pickupEnd,
+    bestBefore: product.bestBefore ?? "",
   };
 }
 
@@ -92,6 +95,7 @@ function parseProductForm(form: ProductFormState) {
     isLuckyBag: form.isLuckyBag,
     pickupStart: form.pickupStart,
     pickupEnd: form.pickupEnd,
+    bestBefore: form.bestBefore || undefined,
   };
 }
 
@@ -172,6 +176,11 @@ export function MerchantProductsScreen() {
                     <span className="rounded-full bg-[#FFF7D8] px-3 py-1 text-[#6A5000]">ขาย {formatCurrency(product.discountedPrice)}</span>
                     <span className="rounded-full bg-black/[0.03] px-3 py-1">เหลือ {product.stockLeft}</span>
                     <span className="rounded-full bg-black/[0.03] px-3 py-1">รับ {product.pickupStart} - {product.pickupEnd}</span>
+                    {product.bestBefore && (
+                      <span className="rounded-full bg-red-50 px-3 py-1 text-red-700">
+                        บริโภคก่อน {new Date(product.bestBefore).toLocaleDateString("th-TH")}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-wrap content-start gap-2 lg:justify-end">
@@ -293,7 +302,7 @@ export function MerchantProductsScreen() {
               </label>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-3">
               <label className="space-y-1 text-sm">
                 <span className="font-semibold">เริ่มรับสินค้า</span>
                 <Input required type="time" value={form.pickupStart} onChange={(event) => updateField("pickupStart", event.target.value)} />
@@ -301,6 +310,10 @@ export function MerchantProductsScreen() {
               <label className="space-y-1 text-sm">
                 <span className="font-semibold">สิ้นสุดรับสินค้า</span>
                 <Input required type="time" value={form.pickupEnd} onChange={(event) => updateField("pickupEnd", event.target.value)} />
+              </label>
+              <label className="space-y-1 text-sm">
+                <span className="font-semibold">ควรบริโภคก่อน</span>
+                <Input type="date" value={form.bestBefore} onChange={(event) => updateField("bestBefore", event.target.value)} />
               </label>
             </div>
 

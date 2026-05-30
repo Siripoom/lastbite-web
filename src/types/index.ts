@@ -60,6 +60,7 @@ export interface Product {
   isLuckyBag: boolean;
   pickupStart: string;
   pickupEnd: string;
+  bestBefore?: string;
 }
 
 export interface OrderItem {
