@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LayoutDashboardIcon, PackageIcon, ReceiptTextIcon, SettingsIcon, WalletIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 import { useMerchantStore } from "@/store/merchant";
+import { useCatalogStore } from "@/store/catalog";
 
 const navItems = [
   { href: "/merchant", label: "หน้าหลัก", icon: LayoutDashboardIcon },
@@ -18,6 +20,34 @@ const navItems = [
 export function MerchantShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { merchant, store } = useMerchantStore();
+  const subscribed = useRef(false);
+
+  useEffect(() => {
+    if (subscribed.current) return;
+    subscribed.current = true;
+    const storeId = "store_001";
+    const { subscribeStore, subscribeProducts, subscribeOrders, subscribeWithdrawals } = useMerchantStore.getState();
+    const unsubStore = subscribeStore(storeId);
+    const unsubProducts = subscribeProducts(storeId);
+    const unsubOrders = subscribeOrders(storeId);
+    const unsubWithdrawals = subscribeWithdrawals(storeId);
+    useCatalogStore.getState().subscribeAll();
+    return () => {
+      unsubStore();
+      unsubProducts();
+      unsubOrders();
+      unsubWithdrawals();
+      useCatalogStore.getState().unsubscribeAll();
+    };
+  }, []);
+
+  if (!store) {
+    return (
+      <div className="grid min-h-screen place-items-center">
+        <p className="text-sm text-[#5D5F5F]">กำลังโหลด...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="page-shell min-h-screen">

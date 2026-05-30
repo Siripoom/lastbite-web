@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { categories } from "@/lib/mock-data";
+import { useCatalogStore } from "@/store/catalog";
 import { formatCurrency } from "@/lib/utils";
 import { useMerchantStore } from "@/store/merchant";
 import type { Product, ProductStatus } from "@/types";
@@ -55,7 +55,7 @@ function createBlankForm(): ProductFormState {
     originalPrice: "",
     discountedPrice: "",
     stockLeft: "1",
-    categoryId: categories[0]?.id ?? "bakery",
+    categoryId: useCatalogStore.getState().categories[0]?.id ?? "",
     status: "active",
     isLuckyBag: false,
     pickupStart: "18:00",
@@ -97,6 +97,7 @@ function parseProductForm(form: ProductFormState) {
 
 export function MerchantProductsScreen() {
   const { products, createProduct, updateProduct, deleteProduct } = useMerchantStore();
+  const categories = useCatalogStore((s) => s.categories);
   const [formOpen, setFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [form, setForm] = useState<ProductFormState>(() => createBlankForm());
@@ -126,14 +127,14 @@ export function MerchantProductsScreen() {
     updateField("imageUrl", URL.createObjectURL(file));
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const input = parseProductForm(form);
 
     if (editingProduct) {
-      updateProduct(editingProduct.id, input);
+      await updateProduct(editingProduct.id, input);
     } else {
-      createProduct(input);
+      await createProduct(input);
     }
 
     setFormOpen(false);

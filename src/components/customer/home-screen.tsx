@@ -6,11 +6,16 @@ import { Card } from "@/components/ui/card";
 import { SearchIcon, SparklesIcon } from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
 import { ProductCard, SectionHeader, StoreCard } from "@/components/customer/catalog-cards";
-import { availableProducts, categories, getStore, visibleStores } from "@/lib/mock-data";
 import { useCustomerStore } from "@/store/customer";
+import { useCatalogStore } from "@/store/catalog";
 
 export function HomeScreen() {
   const user = useCustomerStore((state) => state.user);
+  const categories = useCatalogStore((s) => s.categories);
+  const products = useCatalogStore((s) => s.products);
+  const stores = useCatalogStore((s) => s.stores);
+  const availableProducts = products.filter((p) => p.status === "active" && p.stockLeft > 0);
+  const visibleStores = stores.filter((s) => s.isActive && s.approvalStatus === "approved");
   const luckyBags = availableProducts.filter((product) => product.isLuckyBag);
   const deals = availableProducts.slice(0, 6);
 
@@ -68,7 +73,7 @@ export function HomeScreen() {
         <SectionHeader title="ดีลแนะนำ" action={<Button asChild variant="ghost"><Link href="/app/search">ดูทั้งหมด</Link></Button>} />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {deals.map((product) => (
-            <ProductCard key={product.id} product={product} store={getStore(product.storeId)} />
+            <ProductCard key={product.id} product={product} store={stores.find((s) => s.id === product.storeId)} />
           ))}
         </div>
       </section>
@@ -77,7 +82,7 @@ export function HomeScreen() {
         <SectionHeader title="Lucky Bag" />
         <div className="grid gap-4 md:grid-cols-3">
           {luckyBags.map((product) => (
-            <ProductCard key={product.id} product={product} store={getStore(product.storeId)} />
+            <ProductCard key={product.id} product={product} store={stores.find((s) => s.id === product.storeId)} />
           ))}
         </div>
       </section>

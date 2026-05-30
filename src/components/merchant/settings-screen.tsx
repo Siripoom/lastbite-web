@@ -1,11 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { ArrowRightIcon } from "@/components/ui/icons";
 import { useMerchantStore } from "@/store/merchant";
 
 export function MerchantSettingsScreen() {
   const { store, updateStore } = useMerchantStore();
+  if (!store) return null;
 
   return (
     <div className="mx-auto max-w-4xl space-y-5">
@@ -55,6 +58,15 @@ export function MerchantSettingsScreen() {
           </label>
         </div>
       </Card>
+      <Link href="/merchant/faq">
+        <Card className="flex items-center justify-between p-5 transition hover:shadow-md">
+          <div>
+            <h2 className="text-lg font-bold">คำถามที่พบบ่อย</h2>
+            <p className="mt-1 text-sm text-[#5D5F5F]">ดูคำตอบสำหรับปัญหาที่พบบ่อย</p>
+          </div>
+          <ArrowRightIcon size={20} className="shrink-0 text-[#5D5F5F]" />
+        </Card>
+      </Link>
     </div>
   );
 }

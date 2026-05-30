@@ -1,14 +1,28 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCartIcon } from "@/components/ui/icons";
 import { BottomNav } from "@/components/customer/bottom-nav";
 import { useCustomerStore } from "@/store/customer";
+import { useCatalogStore } from "@/store/catalog";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, cart } = useCustomerStore();
+  const subscribed = useRef(false);
+
+  useEffect(() => {
+    if (subscribed.current) return;
+    subscribed.current = true;
+    useCatalogStore.getState().subscribeAll();
+    const unsubOrders = useCustomerStore.getState().subscribeOrders("cust_001");
+    return () => {
+      useCatalogStore.getState().unsubscribeAll();
+      unsubOrders();
+    };
+  }, []);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   if (user.isActive === false) {

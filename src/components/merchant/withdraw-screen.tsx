@@ -46,7 +46,7 @@ export function MerchantWithdrawScreen() {
     accountNumber.trim() &&
     accountName.trim();
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
 

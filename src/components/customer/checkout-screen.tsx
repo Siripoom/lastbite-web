@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { EmptyState } from "@/components/customer/catalog-cards";
-import { getStore } from "@/lib/mock-data";
+import { useCatalogStore } from "@/store/catalog";
 import { formatCurrency, paymentMethodLabel } from "@/lib/utils";
 import { useCustomerStore } from "@/store/customer";
 import type { PaymentMethod } from "@/types";
@@ -24,10 +24,12 @@ export function CheckoutScreen() {
   const [method, setMethod] = useState<PaymentMethod>("promptPay");
   const [proofUrl, setProofUrl] = useState("");
   const [proofFileName, setProofFileName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const { cart, placeOrder } = useCustomerStore();
+  const getStoreById = useCatalogStore((s) => s.getStoreById);
   const totalOriginal = cart.reduce((sum, item) => sum + item.originalPrice * item.quantity, 0);
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const store = useMemo(() => (cart[0] ? getStore(cart[0].storeId) : undefined), [cart]);
+  const store = useMemo(() => (cart[0] ? getStoreById(cart[0].storeId) : undefined), [cart, getStoreById]);
 
   if (!cart.length) {
     return (
@@ -46,16 +48,21 @@ export function CheckoutScreen() {
     setProofFileName(file.name);
   }
 
-  function submit() {
+  async function submit() {
     if (!proofUrl || !proofFileName) {
       toast.error("กรุณาอัปโหลดหลักฐานการโอนเงินก่อนยืนยันคำสั่งซื้อ");
       return;
     }
-
-    const order = placeOrder({ paymentMethod: method, paymentProofUrl: proofUrl, paymentProofFileName: proofFileName });
-    if (!order) return;
-    toast.success("สร้างออเดอร์สำเร็จ");
-    router.push(`/app/orders/${order.id}`);
+    setSubmitting(true);
+    try {
+      const orderId = await placeOrder({ paymentMethod: method, paymentProofUrl: proofUrl, paymentProofFileName: proofFileName });
+      toast.success("สร้างออเดอร์สำเร็จ");
+      router.push(`/app/orders/${orderId}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "เกิดข้อผิดพลาด กรุณาลองอีกครั้ง");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -153,7 +160,7 @@ export function CheckoutScreen() {
           <div className="flex justify-between"><span>วิธีชำระ</span><span>{paymentMethodLabel(method)}</span></div>
           <div className="flex justify-between"><span>หลักฐาน</span><span>{proofFileName || "ยังไม่ได้อัปโหลด"}</span></div>
         </div>
-        <Button size="lg" className="mt-5 w-full" onClick={submit}>
+        <Button size="lg" className="mt-5 w-full" onClick={submit} disabled={submitting}>
           ยืนยันคำสั่งซื้อ
         </Button>
       </Card>

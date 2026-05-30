@@ -4,11 +4,13 @@ import { useMemo, useState } from "react";
 import { SearchIcon } from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
 import { EmptyState, ProductCard } from "@/components/customer/catalog-cards";
-import { getStore, searchCatalog } from "@/lib/mock-data";
+import { useCatalogStore } from "@/store/catalog";
 
 export function SearchScreen() {
   const [query, setQuery] = useState("");
-  const results = useMemo(() => searchCatalog(query), [query]);
+  const searchCatalog = useCatalogStore((s) => s.searchCatalog);
+  const getStoreById = useCatalogStore((s) => s.getStoreById);
+  const results = useMemo(() => searchCatalog(query), [query, searchCatalog]);
 
   return (
     <div className="space-y-5">
@@ -29,7 +31,7 @@ export function SearchScreen() {
       {results.length ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {results.map((product) => (
-            <ProductCard key={product.id} product={product} store={getStore(product.storeId)} />
+            <ProductCard key={product.id} product={product} store={getStoreById(product.storeId)} />
           ))}
         </div>
       ) : (

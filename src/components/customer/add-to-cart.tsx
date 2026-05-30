@@ -12,14 +12,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getStore } from "@/lib/mock-data";
+import { useCatalogStore } from "@/store/catalog";
 import { useCustomerStore } from "@/store/customer";
 import type { Product, Store } from "@/types";
 
 export function AddToCart({ product, store }: { product: Product; store: Store }) {
   const [quantity, setQuantity] = useState(1);
   const { addProduct, pendingProduct, confirmAddDifferentStore, clearPendingProduct } = useCustomerStore();
-  const pendingStore = pendingProduct ? getStore(pendingProduct.storeId) : undefined;
+  const getStoreById = useCatalogStore((s) => s.getStoreById);
+  const pendingStore = pendingProduct ? getStoreById(pendingProduct.storeId) : undefined;
 
   function add() {
     const result = addProduct(product, store, quantity);

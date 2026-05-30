@@ -1,7 +1,9 @@
 "use client";
 
 import { create } from "zustand";
-import { seedOrders } from "@/lib/mock-data";
+import { doc, onSnapshot, query, runTransaction, where } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { ordersCol, productsCol, storesCol } from "@/lib/firestore";
 import { makePickupCode } from "@/lib/utils";
 import type { CartItem, Order, PaymentMethod, Product, Store, User } from "@/types";
 
@@ -19,6 +21,7 @@ interface CustomerState {
   user: User;
   cart: CartItem[];
   orders: Order[];
+  ordersLoaded: boolean;
   pendingProduct: Product | null;
   addProduct: (product: Product, store: Store, quantity?: number) => "added" | "needsClear" | "blocked";
   confirmAddDifferentStore: (product: Product, store: Store, quantity?: number) => void;
@@ -26,7 +29,8 @@ interface CustomerState {
   updateQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
   clearCart: () => void;
-  placeOrder: (input: { paymentMethod: PaymentMethod; paymentProofUrl: string; paymentProofFileName: string }) => Order | null;
+  placeOrder: (input: { paymentMethod: PaymentMethod; paymentProofUrl: string; paymentProofFileName: string }) => Promise<string>;
+  subscribeOrders: (userId: string) => () => void;
   suspendDemoUser: (isActive: boolean) => void;
 }
 
@@ -47,7 +51,8 @@ function productToCartItem(product: Product, quantity: number): CartItem {
 export const useCustomerStore = create<CustomerState>((set, get) => ({
   user: demoUser,
   cart: [],
-  orders: seedOrders,
+  orders: [],
+  ordersLoaded: false,
   pendingProduct: null,
 
   addProduct: (product, _store, quantity = 1) => {
@@ -92,20 +97,80 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
 
   clearCart: () => set({ cart: [] }),
 
-  placeOrder: ({ paymentMethod, paymentProofUrl, paymentProofFileName }) => {
+  placeOrder: async ({ paymentMethod, paymentProofUrl, paymentProofFileName }) => {
     const cart = get().cart;
-    if (!cart.length) return null;
+    if (!cart.length) throw new Error("ตะกร้าว่างเปล่า");
 
     const totalOriginalPrice = cart.reduce((sum, item) => sum + item.originalPrice * item.quantity, 0);
     const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const firstItem = cart[0];
-    const storeOrder = seedOrders.find((order) => order.storeId === firstItem.storeId);
-    const order: Order = {
-      id: `ORD-${Date.now().toString().slice(-6)}`,
+    const newOrderRef = doc(ordersCol);
+    const pickupCode = makePickupCode();
+    const createdAt = new Date().toISOString();
+    let orderStoreName = "LastBite Store";
+    let orderStoreImageUrl = firstItem.imageUrl;
+
+    await runTransaction(db, async (tx) => {
+      // Phase 1: all reads first
+      const productSnaps = await Promise.all(
+        cart.map((item) => tx.get(doc(productsCol, item.productId)))
+      );
+      const storeSnap = await tx.get(doc(storesCol, firstItem.storeId));
+
+      // Validate
+      for (let i = 0; i < cart.length; i++) {
+        const snap = productSnaps[i];
+        const item = cart[i];
+        if (!snap.exists()) throw new Error(`สินค้า "${item.name}" ไม่พบในระบบ`);
+        const data = snap.data();
+        if (data.status !== "active") throw new Error(`สินค้า "${item.name}" ไม่พร้อมขายแล้ว`);
+        if (data.stockLeft < item.quantity) throw new Error(`สินค้า "${item.name}" เหลือไม่พอ`);
+      }
+      if (storeSnap.exists()) {
+        const sd = storeSnap.data();
+        orderStoreName = sd.name ?? "LastBite Store";
+        orderStoreImageUrl = sd.imageUrl ?? firstItem.imageUrl;
+      }
+
+      // Phase 2: all writes after all reads
+      for (let i = 0; i < cart.length; i++) {
+        const data = productSnaps[i].data()!;
+        tx.update(doc(productsCol, cart[i].productId), { stockLeft: data.stockLeft - cart[i].quantity });
+      }
+
+      tx.set(newOrderRef, {
+        id: newOrderRef.id,
+        userId: get().user.id,
+        storeId: firstItem.storeId,
+        storeName: orderStoreName,
+        storeImageUrl: orderStoreImageUrl,
+        items: cart.map((item) => ({
+          productId: item.productId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          imageUrl: item.imageUrl,
+        })),
+        status: "waitingPickup",
+        pickupCode,
+        pickupTime: firstItem.pickupTime,
+        paymentMethod,
+        paymentProofUrl,
+        paymentProofFileName,
+        totalOriginalPrice,
+        totalPrice,
+        createdAt,
+      });
+    });
+
+    // Optimistically add the order to local state so the order detail screen
+    // can display it immediately before the onSnapshot listener fires.
+    const newOrder: Order = {
+      id: newOrderRef.id,
       userId: get().user.id,
       storeId: firstItem.storeId,
-      storeName: storeOrder?.storeName ?? "LastBite Store",
-      storeImageUrl: storeOrder?.storeImageUrl ?? firstItem.imageUrl,
+      storeName: orderStoreName,
+      storeImageUrl: orderStoreImageUrl,
       items: cart.map((item) => ({
         productId: item.productId,
         name: item.name,
@@ -114,18 +179,26 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
         imageUrl: item.imageUrl,
       })),
       status: "waitingPickup",
-      pickupCode: makePickupCode(),
+      pickupCode,
       pickupTime: firstItem.pickupTime,
       paymentMethod,
       paymentProofUrl,
       paymentProofFileName,
       totalOriginalPrice,
       totalPrice,
-      createdAt: new Date().toISOString(),
+      createdAt,
     };
+    set((state) => ({ cart: [], orders: [newOrder, ...state.orders] }));
+    return newOrderRef.id;
+  },
 
-    set((state) => ({ orders: [order, ...state.orders], cart: [] }));
-    return order;
+  subscribeOrders: (userId) => {
+    return onSnapshot(query(ordersCol, where("userId", "==", userId)), (snap) => {
+      const orders = snap.docs
+        .map((d) => ({ id: d.id, ...d.data() }) as Order)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      set({ orders, ordersLoaded: true });
+    });
   },
 
   suspendDemoUser: (isActive) => {

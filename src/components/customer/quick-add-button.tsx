@@ -12,14 +12,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getStore } from "@/lib/mock-data";
+import { useCatalogStore } from "@/store/catalog";
 import { useCustomerStore } from "@/store/customer";
 import type { Product, Store } from "@/types";
 
 export function QuickAddButton({ product, store }: { product: Product; store: Store }) {
   const { addProduct, pendingProduct, confirmAddDifferentStore, clearPendingProduct } = useCustomerStore();
+  const getStoreById = useCatalogStore((s) => s.getStoreById);
   const isPendingThisProduct = pendingProduct?.id === product.id;
-  const pendingStore = pendingProduct ? getStore(pendingProduct.storeId) : undefined;
+  const pendingStore = pendingProduct ? getStoreById(pendingProduct.storeId) : undefined;
 
   function quickAdd(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();

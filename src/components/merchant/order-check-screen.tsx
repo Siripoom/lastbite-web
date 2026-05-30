@@ -85,6 +85,7 @@ export function MerchantOrderCheckScreen() {
   const orderId = searchParams.get("orderId") ?? "";
   const code = searchParams.get("code") ?? "";
   const { store, orders, updateOrderStatus } = useMerchantStore();
+  if (!store) return null;
   const order = orders.find((item) => item.id === orderId);
 
   const isStoreOrder = order?.storeId === store.id;

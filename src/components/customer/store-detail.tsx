@@ -1,13 +1,15 @@
+"use client";
+
 import { ProductCard, SectionHeader } from "@/components/customer/catalog-cards";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Clock3Icon, MapPinIcon, PhoneIcon, StarIcon } from "@/components/ui/icons";
-import { getProductsByStore } from "@/lib/mock-data";
+import { useCatalogStore } from "@/store/catalog";
 import { pickupRange } from "@/lib/utils";
 import type { Store } from "@/types";
 
 export function StoreDetail({ store }: { store: Store }) {
-  const products = getProductsByStore(store.id);
+  const products = useCatalogStore((s) => s.getProductsByStore(store.id));
 
   return (
     <div className="space-y-7">

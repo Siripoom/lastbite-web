@@ -10,6 +10,7 @@ import { formatCurrency, orderStatusLabel } from "@/lib/utils";
 
 export function MerchantDashboardScreen() {
   const { store, products, orders } = useMerchantStore();
+  if (!store) return null;
   const activeProducts = products.filter((product) => product.status === "active");
   const openOrders = orders.filter((order) => ["waitingPickup", "preparing", "ready"].includes(order.status));
   const grossSales = orders.reduce((sum, order) => sum + order.totalPrice, 0);
